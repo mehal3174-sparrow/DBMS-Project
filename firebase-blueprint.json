@@ -1,0 +1,93 @@
+{
+  "entities": {
+    "Patient": {
+      "title": "Patient",
+      "description": "Information about a patient requiring blood.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Full name of the patient" },
+        "bloodGroup": { "type": "string", "enum": ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"], "description": "Blood group of the patient" },
+        "disease": { "type": "string", "description": "Disease or condition requiring blood" },
+        "contact": { "type": "string", "description": "Contact number" },
+        "address": { "type": "string", "description": "Residential address" },
+        "uid": { "type": "string", "description": "Firebase Auth UID of the patient record owner" }
+      },
+      "required": ["name", "bloodGroup", "uid"]
+    },
+    "Donor": {
+      "title": "Donor",
+      "description": "Information about a blood donor.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Full name of the donor" },
+        "bloodGroup": { "type": "string", "enum": ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"], "description": "Blood group of the donor" },
+        "medicalReport": { "type": "string", "description": "Summary of medical reports" },
+        "address": { "type": "string", "description": "Residential address" },
+        "contact": { "type": "string", "description": "Contact number" },
+        "uid": { "type": "string", "description": "Firebase Auth UID of the donor" },
+        "lastDonationDate": { "type": "string", "format": "date-time", "description": "Date of last donation" }
+      },
+      "required": ["name", "bloodGroup", "uid"]
+    },
+    "BloodBank": {
+      "title": "Blood Bank",
+      "description": "Information about a blood bank facility.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the blood bank" },
+        "address": { "type": "string", "description": "Physical address" },
+        "contact": { "type": "string", "description": "Contact number" },
+        "inventory": { 
+          "type": "object", 
+          "description": "Current stock levels for each blood type",
+          "properties": {
+            "A+": { "type": "number" },
+            "A-": { "type": "number" },
+            "B+": { "type": "number" },
+            "B-": { "type": "number" },
+            "AB+": { "type": "number" },
+            "AB-": { "type": "number" },
+            "O+": { "type": "number" },
+            "O-": { "type": "number" }
+          }
+        },
+        "managerUid": { "type": "string", "description": "UID of the blood bank manager" }
+      },
+      "required": ["name", "address", "managerUid"]
+    },
+    "Donation": {
+      "title": "Donation",
+      "description": "A record of a blood donation event.",
+      "type": "object",
+      "properties": {
+        "donorId": { "type": "string", "description": "UID of the donor" },
+        "bloodBankId": { "type": "string", "description": "ID of the blood bank" },
+        "date": { "type": "string", "format": "date-time" },
+        "units": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "completed", "rejected"] }
+      },
+      "required": ["donorId", "bloodBankId", "units", "status"]
+    },
+    "Request": {
+      "title": "Request",
+      "description": "A request for blood by a patient.",
+      "type": "object",
+      "properties": {
+        "patientId": { "type": "string", "description": "UID of the patient" },
+        "bloodBankId": { "type": "string", "description": "ID of the blood bank" },
+        "bloodGroup": { "type": "string" },
+        "units": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "approved", "fulfilled", "rejected"] },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["patientId", "bloodBankId", "bloodGroup", "units", "status"]
+    }
+  },
+  "firestore": {
+    "/patients/{patientId}": { "schema": "Patient", "description": "Patient records" },
+    "/donors/{donorId}": { "schema": "Donor", "description": "Donor records" },
+    "/bloodBanks/{bankId}": { "schema": "BloodBank", "description": "Blood bank records" },
+    "/donations/{donationId}": { "schema": "Donation", "description": "Donation history" },
+    "/requests/{requestId}": { "schema": "Request", "description": "Blood requests" }
+  }
+}

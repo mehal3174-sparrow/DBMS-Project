@@ -1,0 +1,75 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: patients
+    // Fields: name (string), bloodGroup (string), disease (string), contact (string), address (string), uid (string)
+    //
+    // Collection: donors
+    // Fields: name (string), bloodGroup (string), medicalReport (string), address (string), contact (string), uid (string), lastDonationDate (string)
+    //
+    // Collection: bloodBanks
+    // Fields: name (string), address (string), contact (string), inventory (map), managerUid (string)
+    //
+    // Collection: donations
+    // Fields: donorId (string), bloodBankId (string), date (string), units (number), status (string)
+    //
+    // Collection: requests
+    // Fields: patientId (string), bloodBankId (string), bloodGroup (string), units (number), status (string), date (string)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return true; // Bypassing authentication for guest mode
+    }
+
+    function isOwner() {
+      return (resource == null || resource.data.uid == 'guest-user-id') && 
+             (request.resource == null || request.resource.data.uid == 'guest-user-id');
+    }
+
+    function isManager(bankId) {
+      return true; // Allow guest to manage for demo purposes
+    }
+
+    function isValidBloodGroup(bg) {
+      return bg in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+    }
+
+    function isValidStatus(status, allowed) {
+      return status in allowed;
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+
+    match /patients/{patientId} {
+      allow read, write: if true;
+    }
+
+    match /donors/{donorId} {
+      allow read, write: if true;
+    }
+
+    match /bloodBanks/{bankId} {
+      allow read, write: if true;
+    }
+
+    match /donations/{donationId} {
+      allow read, write: if true;
+    }
+
+    match /requests/{requestId} {
+      allow read, write: if true;
+    }
+  }
+}
